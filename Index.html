@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人网站</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        header {
+            background: #1f1f1f;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+            color: #ffcc70;
+        }
+        nav {
+            margin-top: 10px;
+        }
+        nav a {
+            color: #ccc;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #ffcc70;
+        }
+        section {
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        h2 {
+            color: #ffcc70;
+            border-bottom: 2px solid #ffcc70;
+            padding-bottom: 5px;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #1f1f1f;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            border-top: 1px solid #333;
+            background: #1f1f1f;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>我的名字</h1>
+        <nav>
+            <a href="#about">关于我</a>
+            <a href="#skills">技能</a>
+            <a href="#projects">作品</a>
+            <a href="#contact">联系</a>
+        </nav>
+    </header>
+
+    <section id="about">
+        <h2>关于我</h2>
+        <p>你好，我是一名前端/后端开发者，喜欢用代码创造美好的东西。</p>
+    </section>
+
+    <section id="skills">
+        <h2>技能</h2>
+        <ul>
+            <li>HTML / CSS / JavaScript</li>
+            <li>Python / Flask / Django</li>
+            <li>Node.js / Express</li>
+        </ul>
+    </section>
+
+    <section id="projects">
+        <h2>作品展示</h2>
+        <div class="projects">
+            <div class="card">
+                <h3>项目 1</h3>
+                <p>项目简介，支持链接和截图。</p>
+            </div>
+            <div class="card">
+                <h3>项目 2</h3>
+                <p>项目简介，支持链接和截图。</p>
+            </div>
+            <div class="card">
+                <h3>项目 3</h3>
+                <p>项目简介，支持链接和截图。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>联系方式</h2>
+        <p>Email: yourname@example.com</p>
+        <p>GitHub: <a href="#" target="_blank">github.com/yourname</a></p>
+    </section>
+
+    <footer>
+        &copy; 2025 我的名字 | 暗色主题个人网站
+    </footer>
+</body>
+</html>
