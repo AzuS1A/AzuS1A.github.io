@@ -414,7 +414,7 @@ window.addEventListener('load', () => {
 
 /* ========== 滚动指示点 ========== */
 const dotsBox=document.getElementById('dots');
-for(let i=0;i<10;i++){const d=document.createElement('span');d.className='point';dotsBox.appendChild(d);}
+for(let i=0;i<8;i++){const d=document.createElement('span');d.className='point';dotsBox.appendChild(d);}
 const dots=document.querySelectorAll('.point');
 let di=0; dots[0].classList.add('active');
 setInterval(()=>{
