@@ -454,24 +454,43 @@ function jrrp() {
   document.getElementById('jrrp').textContent = "今日人品："+ currentTimeMillis % 1000 /10;
 }
 
-/* ========== 轮询聊天室 ========== */
+/* ========== 聊天室 ========== */
 class Chat {
   constructor(opts = {}) {
+    this.wsUrl = opts.wsUrl || 'ws://127.0.0.1:8765';
     this.user  = opts.user  || '用户' + Math.floor(Math.random() * 1000);
     this.room  = opts.room  || 'default';
     this.avatar= opts.avatar|| './headimg.avif';
-    this.chatBox = document.getElementById('chatBox');
-    this.msgs   = document.getElementById('msgs');
-    this.input  = document.getElementById('input');
-    this.file   = document.getElementById('file');
-    this.lastId = 0;          // 简单去重
     this.init();
   }
 
   init() {
-    this.chatBox.style.display = '';          // 直接显示
+    // 1) 先隐藏聊天区域
+    this.chatBox   = document.getElementById('chatBox'); // 整个聊天窗口
+    this.chatBox.style.display = 'none';
+
+    this.msgs   = document.getElementById('msgs');
+    this.input  = document.getElementById('input');
+    this.file   = document.getElementById('file');
+    this.connect();
     this.bindEvents();
-    this.poll();                            // 开始轮询
+  }
+
+  connect() {
+    this.ws = new WebSocket(`${this.wsUrl}?user=${encodeURIComponent(this.user)}&room=${encodeURIComponent(this.room)}`);
+
+    this.ws.onopen = () => {
+      this.addInfo('已连接');
+      this.chatBox.style.display = '';        // 2) 连上后显示
+    };
+
+    this.ws.onclose = () => {
+      this.addInfo('断开，3s后重连');
+      this.chatBox.style.display = 'none';    // 3) 断线后隐藏
+      setTimeout(() => this.connect(), 3000);
+    };
+
+    this.ws.onmessage = e => this.handle(JSON.parse(e.data));
   }
 
   bindEvents() {
@@ -480,67 +499,34 @@ class Chat {
     this.file.addEventListener('change', e => this.sendFile(e.target.files[0]));
   }
 
-  /* ---------- 发送文字 ---------- */
-  async sendText() {
+  sendText() {
     const txt = this.input.value.trim();
     if (!txt) return;
-    await this.post({ msg: txt });
+    this.ws.send(JSON.stringify({ type: 'chat', user: this.user, msg: txt, avatar: this.avatar }));
     this.input.value = '';
   }
 
-  /* ---------- 发送文件 ---------- */
-  async sendFile(file) {
+  sendFile(file) {
     if (!file) return;
     const isImg = file.type.startsWith('image/');
     const isVid = file.type.startsWith('video/');
     if (!isImg && !isVid) { alert('仅支持图片/视频'); return; }
-    const max = isImg ? 12 : 29; // MB
-    if (file.size > max * 1024 * 1024) { alert(`${isImg?'图片':'视频'}不能超${max}MB`); return; }
+    const max = isImg ? 12 : 29;
+    if (file.size > max * 1024 * 1024) { alert(`${isImg ? '图片' : '视频'}不能超${max}MB`); return; }
     const reader = new FileReader();
-    reader.onload = async () => {
-      await this.post({
-        msg: reader.result,
-        is_image: isImg,
-        is_video: isVid
-      });
+    reader.onload = e => {
+      this.ws.send(JSON.stringify({
+        type: 'chat', user: this.user, msg: e.target.result,
+        avatar: this.avatar, is_image: isImg, is_video: isVid
+      }));
     };
     reader.readAsDataURL(file);
     this.file.value = '';
   }
 
-  /* ---------- 统一 POST ---------- */
-  async post(obj) {
-    const body = {
-      type: 'chat',
-      user: this.user,
-      avatar: this.avatar,
-      ...obj,
-      time: new Date().toISOString()
-    };
-    await fetch(`./api/chat-${this.room}.json`, {
-      method: 'POST',
-      // 注意：GitHub Pages 不接受 POST，这里用 GET + query 模拟
-      // 真正写入由 GitHub Actions 定时任务完成
-    });
-    // 立即本地追加，模拟实时
-    this.addMsg(body);
-  }
-
-  /* ---------- 轮询拉取 ---------- */
-  async poll() {
-    try {
-      const res  = await fetch(`./api/chat-${this.room}.json`);
-      const arr  = await res.json();
-      arr.forEach(m => {
-        if (m.id > this.lastId) {
-          this.addMsg(m);
-          this.lastId = m.id;
-        }
-      });
-    } catch(e) {
-      console.warn('poll error', e);
-    }
-    setTimeout(() => this.poll(), 2000);      // 2 秒轮询
+  handle(d) {
+    if (d.type === 'chat') this.addMsg(d);
+    else this.addInfo(`${d.user} ${d.type === 'user_joined' ? '加入' : '离开'}`);
   }
 
   addMsg({ user, msg, avatar, is_image, is_video, time }) {
@@ -555,13 +541,21 @@ class Chat {
     this.msgs.appendChild(el);
     this.msgs.scrollTop = this.msgs.scrollHeight;
   }
+
+  addInfo(txt) {
+    const div = document.createElement('div');
+    div.style.cssText = 'text-align:center;color:#666;font-size:12px;margin:5px 0';
+    div.textContent = txt;
+    this.msgs.appendChild(div);
+    this.msgs.scrollTop = this.msgs.scrollHeight;
+  }
 }
 
 /* ========== 初始化 ========== */
 window.addEventListener('load', () => {
   const params = new URLSearchParams(location.search);
   new Chat({
-    wsUrl: params.get('ws') || 'ws://127.0.0.1:8765',
+    wsUrl: params.get('ws') || 'ws://[2409:8a62:4122:e400:c5c6:24a7:d87:ed9d]:8765',
     user:  params.get('user') || '用户' + Math.floor(Math.random() * 1000),
     room:  params.get('room') || 'default',
     avatar:params.get('avatar') || './headimg.avif'
