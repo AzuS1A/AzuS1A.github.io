@@ -175,12 +175,17 @@ button{
   <div class="quote-list" id="quoteList">
     <!-- 当前随机一言 -->
     <div class="quote-item" active id="currentQuote">
-    <h2 style="font-size: medium;">📜 一言<h2>
+    <h2 style="font-size: medium;">📜 一言
       <div style="font-size: medium;" class="quote-text blink-area" id="sentence"></div>
       <div style="font-size: medium;" class="quote-author" id="author"></div>
       <div style="font-size: medium;" class="quote-category" id="category"></div>
-      <button onclick="newQuote()" style="font-size: medium;">换一句</button>
+      <button onclick="newQuote()" style="font-size: medium;">换一句</button></h2>
     </div>
+    <!-- 当前今日人品 -->
+    <div class="quote-item" active id="jrrp"><h2>
+        <div style="font-size: medium;" class="quote-text blink-area2" id="jrrp">还没获取今日人品哦</div>
+        <button onclick="jrrp()" style="font-size: medium;">今日人品</button></h2>
+      </div>
   </div>
 </div>
 
@@ -438,6 +443,16 @@ function newQuote() {
 }
 window.addEventListener('load', newQuote);
 
+function jrrp() {
+  const area = document.querySelector('.blink-area2');
+  area.classList.add('blink');
+  setTimeout(() => area.classList.remove('blink'), 400);
+
+  const idx = Math.floor(Math.random() * allQuotes.length);
+  const quote = allQuotes[idx];
+  let currentTimeMillis = Date.now();
+  document.getElementById('jrrp').textContent = "今日人品："+ currentTimeMillis % 1000 /10;
+}
 
 /* ========== 聊天室 ========== */
 class Chat{
