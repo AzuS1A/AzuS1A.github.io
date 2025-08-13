@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>WebSocket Chat</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{height:100vh;display:flex;background:#f5f5f5}
+.chat-container{width:100%;max-width:800px;margin:0 auto;background:#fff;border-radius:10px;display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.chat-header{background:#007bff;color:#fff;padding:15px;text-align:center;font-weight:bold}
+.messages-container{flex:1;padding:20px;overflow-y:auto;background:#fafafa}
+.message{display:flex;margin-bottom:15px;align-items:flex-start}
+.message.own{flex-direction:row-reverse}
+.avatar{width:40px;height:40px;border-radius:50%;margin:0 10px;object-fit:cover;border:2px solid #e0e0e0}
+.message-content{max-width:70%;background:#fff;padding:10px 15px;border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.1);word-break:break-all}
+.message.own .message-content{background:#007bff;color:#fff}
+.message img,.message video{max-width:100%;max-height:300px;border-radius:10px}
+.message-info{font-size:12px;color:#666;margin-top:5px}
+.message.own .message-info{color:#ccc}
+.input-container{padding:15px;border-top:1px solid #eee;display:flex;gap:10px}
+.input-container input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none;ime-mode:auto!important}
+.input-container button,.file-label{padding:10px 18px;border:none;background:#007bff;color:#fff;border-radius:20px;cursor:pointer;font-size:14px}
+.input-container button:hover,.file-label:hover{background:#0056b3}
+.file-input{display:none}
+</style>
+</head>
+<body>
+<div class="chat-container">
+  <div class="chat-header">WebSocket Chat</div>
+  <div class="messages-container" id="msgs"></div>
+  <div class="input-container">
+    <input id="input" type="text" placeholder="输入消息..." autocomplete="off" />
+    <input id="file" type="file" accept="image/*,video/*" class="file-input" />
+    <label for="file" class="file-label">文件</label>
+    <button id="sendBtn">发送</button>
+  </div>
+</div>
+
+<script>
+class Chat {
+  constructor(opts = {}) {
+    this.wsUrl = opts.wsUrl || 'ws://223.85.151.211:27226';
+    this.user = opts.user || '用户' + Math.floor(Math.random() * 1000);
+    this.room = opts.room || 'default';
+    this.avatar = opts.avatar || './headimg.avif';
+    this.init();
+  }
+  init() {
+    this.msgs = document.getElementById('msgs');
+    this.input = document.getElementById('input');
+    this.file = document.getElementById('file');
+    this.connect();
+    this.bindEvents();
+  }
+  connect() {
+    this.ws = new WebSocket(`${this.wsUrl}?user=${encodeURIComponent(this.user)}&room=${encodeURIComponent(this.room)}`);
+    this.ws.onopen = () => this.addInfo('已连接');
+    this.ws.onclose = () => { this.addInfo('断开，3s后重连'); setTimeout(() => this.connect(), 3000); };
+    this.ws.onmessage = e => this.handle(JSON.parse(e.data));
+  }
+  bindEvents() {
+    document.getElementById('sendBtn').addEventListener('click', () => this.sendText());
+    // 用 keyup 而非 keypress/keydown，避免输入法拦截
+    this.input.addEventListener('keyup', e => {
+      if (e.key === 'Enter') this.sendText();
+    });
+    this.file.addEventListener('change', e => this.sendFile(e.target.files[0]));
+  }
+  sendText() {
+    const txt = this.input.value.trim();
+    if (!txt) return;
+    this.ws.send(JSON.stringify({ type: 'chat', user: this.user, msg: txt, avatar: this.avatar }));
+    this.input.value = '';
+  }
+  sendFile(file) {
+    if (!file) return;
+    const isImg = file.type.startsWith('image/');
+    const isVid = file.type.startsWith('video/');
+    if (!isImg && !isVid) return alert('仅支持图片/视频');
+    const max = isImg ? 12 : 29; // MB
+    if (file.size > max * 1024 * 1024) return alert(`${isImg ? '图片' : '视频'}不能超${max}MB`);
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.ws.send(JSON.stringify({
+        type: 'chat',
+        user: this.user,
+        msg: e.target.result,
+        avatar: this.avatar,
+        is_image: isImg,
+        is_video: isVid
+      }));
+    };
+    reader.readAsDataURL(file);
+    this.file.value = '';
+  }
+  handle(d) {
+    if (d.type === 'chat') this.addMsg(d);
+    else this.addInfo(`${d.user} ${d.type === 'user_joined' ? '加入' : '离开'}`);
+  }
+  addMsg({ user, msg, avatar, is_image, is_video, time }) {
+    const own = user === this.user;
+    const el = document.createElement('div');
+    el.className = 'message ' + (own ? 'own' : '');
+    let media = '';
+    if (is_image) media = `<img src="${msg}" alt="图片" onclick="window.open('${msg}')" />`;
+    else if (is_video) media = `<video controls style="max-width:100%;max-height:300px;border-radius:10px"><source src="${msg}"></video>`;
+    else media = msg;
+    el.innerHTML = `
+      <img class="avatar" src="${avatar}" />
+      <div class="message-content">
+        ${media}
+        <div class="message-info">${user} · ${new Date(time).toLocaleTimeString()}</div>
+      </div>`;
+    this.msgs.appendChild(el);
+    this.msgs.scrollTop = this.msgs.scrollHeight;
+  }
+  addInfo(txt) {
+    const div = document.createElement('div');
+    div.style.cssText = 'text-align:center;color:#666;font-size:12px;margin:5px 0';
+    div.textContent = txt;
+    this.msgs.appendChild(div);
+    this.msgs.scrollTop = this.msgs.scrollHeight;
+  }
+}
+
+// 启动
+new Chat({
+  wsUrl: (new URLSearchParams(location.search).get('ws')) || 'ws://localhost:8765',
+  user: (new URLSearchParams(location.search).get('user')) || ('用户' + Math.floor(Math.random() * 1000)),
+  room: (new URLSearchParams(location.search).get('room')) || 'default',
+  avatar: (new URLSearchParams(location.search).get('avatar')) || './headimg.avif'
+});
+</script>
+</body>
+</html>

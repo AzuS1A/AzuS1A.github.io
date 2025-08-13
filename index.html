@@ -2,87 +2,67 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>一言</title>
-<meta name="github-repo" content="AzuS1A/AzuS1A.github.io">
+<title>一言 + 聊天室</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-@font-face {
-  font-family: "FZLanLight";
-  src: url("./FZLanLight.TTF") format("truetype");
-
-  font-family: "FZLanHeavy";
-  src: url("./FZLanHeavy.TTF") format("truetype");
+/* ===== 通用字体 ===== */
+@font-face{
+  font-family:"FZLanLight";
+  src:url("./FZLanLight.TTF") format("truetype");
 }
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{
-    /* 仅留顶部安全间距，避免内容被页眉遮挡 */
-    padding-top:10px;
-    background:linear-gradient(135deg,#e6f2ff,#f8fbff);
-    color:#333;
-    background-image: url("./main.png");
-    font-family: 'FZLanLight';
-  }
+@font-face{
+  font-family:"FZLanHeavy";
+  src:url("./FZLanHeavy.TTF") format("truetype");
+}
 
-  /* 固定在屏幕最上方的卡片 */
-  .header-card{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    z-index:1000;
-    background:#fff;
-    border-radius:0 0 20px 20px;
-    box-shadow:0 8px 20px rgba(0,0,0,.1);
-    padding:15px 10px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
+/* ===== 全局 ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;
+  background:linear-gradient(135deg,#e6f2ff,#f8fbff) fixed;
+  background-image:url("./main.png");
+  font-family:FZLanLight;
+  color:#333;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:140px;   /* 给顶部卡片留空间 */
+}
 
-  h2{
-    font-size:1.4em;
-    color:#0066cc;
-    margin-bottom:6px;
-  }
-
-  /* 渐变光扫文字 */
-  #sentence{
-    font-size:1em;
-    line-height:1.5;
-    min-height:40px;
-    background:linear-gradient(90deg,#00aaff 0%,#0066cc 50%,#00aaff 100%);
-    background-size:200% auto;
-    background-clip:border-box;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:shine 3s linear infinite;
-  }
-  @keyframes shine{
-    to{background-position:-200% center;}
-  }
-
-  .info-container{
-    display:flex;
-    gap:20px;
-    margin-top:5px;
-    font-size:.9em;
-  }
-  #author{color:#0099cc}
-  #category{color:#888}
-
-  button{
-    margin-top:12px;
-    background:#00aaff;
-    border:none;
-    padding:8px 18px;
-    border-radius:12px;
-    color:#fff;
-    font-size:1em;
-    cursor:pointer;
-  }
-  button:hover{
-    background:#0088cc;
-  }
-  .blink {
+/* ===== 顶部固定卡片 ===== */
+.header-card{
+  position:fixed;
+  top:0;left:0;width:100%;
+  z-index:1000;
+  background:#fff;
+  border-radius:0 0 20px 20px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+  padding:15px 10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  height: 15vh;
+  overflow-y: auto;
+}
+h2{font-size:1.4em;color:#0066cc;margin-bottom:6px}
+#sentence{
+  font-size:1em;line-height:1.5;min-height:40px;
+  background:linear-gradient(90deg,#00aaff 0%,#0066cc 50%,#00aaff 100%);
+  background-size:200% auto;
+  background-clip:border-box ;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shine 3s linear infinite;
+  max-width:70vw;text-align:center;
+}
+@keyframes shine{to{background-position:-200% center;}}
+button{
+  margin-top:12px;
+  background:#00aaff;border:none;padding:8px 18px;
+  border-radius:12px;color:#fff;font-size:1em;cursor:pointer;
+}
+button:hover{background:#0088cc}
+.blink {
             animation: blink 0.07s 3;
         }
         
@@ -91,158 +71,96 @@
             50% { opacity: 0; }
             100% { opacity: 1; }
         }
-  .card , .sentence1
-  {
-    display: flex;
-    justify-content: center; /* 水平居中 */
-  }
-  #sentence
-  {
-    max-width: 70vw;
-  }
 
+/* ===== 聊天室 ===== */
+/* 聊天容器：宽度 100%，最大 800px，固定高度 400px */
+.chat-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 80vh;              /* 固定高度 */
+  margin: 5px auto;
+  background: #fff;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+  overflow: hidden;           /* 让子元素不溢出圆角 */
+}
+
+/* 消息区：占剩余高度，出现滚动条 */
+.messages-container {
+  flex: 1 1 auto;             /* 占满剩余空间 */
+  overflow-y: auto;           /* 纵向滚动 */
+  padding: 20px;
+  background: #fafafa;
+}
+.chat-header{background:#007bff;color:#fff;padding:15px;text-align:center;font-weight:bold}
+.message{display:flex;margin-bottom:15px;align-items:flex-start}
+.message.own{flex-direction:row-reverse}
+.avatar{width:40px;height:40px;border-radius:50%;margin:0 10px;object-fit:cover;border:2px solid #e0e0e0}
+.message-content{max-width:70%;background:#fff;padding:10px 15px;border-radius:18px;box-shadow:0 1px 2px rgba(0,0,0,.1);word-break:break-all}
+.message.own .message-content{background:#007bff;color:#fff}
+.message img,.message video{max-width:100%;max-height:300px;border-radius:10px;cursor:pointer}
+.message-info{font-size:12px;color:#666;margin-top:5px}
+.message.own .message-info{color:#ccc}
+.input-container{padding:15px;border-top:1px solid #eee;display:flex;gap:10px}
+.input-container input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none}
+.input-container button,.file-label{padding:10px 18px;border:none;background:#007bff;color:#fff;border-radius:20px;cursor:pointer;font-size:14px}
+.input-container button:hover,.file-label:hover{background:#0056b3}
+.file-input{display:none}
+
+/* ===== 左下角滚动提示 ===== */
+:root{
+  --dotColor:#000;--dotActive:#6dacff;
+  --dotW:21px;--dotH:5px;--dotGap:5px;--textColor:#000;
+}
+.scroll-hint{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;pointer-events:none;z-index:999}
+.pointList{display:flex;gap:var(--dotGap)}
+.point{width:var(--dotW);height:var(--dotH);background:var(--dotColor);opacity:.1;transform:skew(-30deg);transition:all .3s}
+.point.active{background:var(--dotActive);opacity:1;width:22px}
+.scroll-hint .text{margin-top:10px;font-size:11px;letter-spacing:.1em;color:var(--textColor);opacity:.6}
+
+/* ===== 加载遮罩 ===== */
+#loader{
+  position:fixed;inset:0;background:#fff;display:flex;justify-content:center;align-items:center;
+  z-index:9999;font-size:1.5em;color:#0066cc;transition:opacity .5s
+}
 </style>
-<style>
-  /* scroll */
-  /* ===== 可自定义变量 ===== */
-  :root {
-      --dotColor: #000000;
-      /* 普通平行四边形颜色 */
-      --dotActive: #6dacff;
-      /* 高亮颜色 */
-      --dotW: 21px;
-      /* 平行四边形宽 */
-      --dotH: 5px;
-      /* 平行四边形高 */
-      --dotGap: 5px;
-      /* 间距 */
-      --textColor: #000000;
-      /* 文字颜色 */
-  }
-
-  /* ===== 布局定位 ===== */
-  .scroll-hint {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      /* 文字贴左边 */
-      pointer-events: none;
-      z-index: 999;
-  }
-
-  /* ===== 横向平行四边形列 ===== */
-  .pointList {
-      display: flex;
-      gap: var(--dotGap);
-  }
-
-  .point {
-      width: var(--dotW);
-      /* 默认宽度 */
-      height: var(--dotH);
-      background: var(--dotColor);
-      opacity: .1;
-      transform: skew(-30deg);
-      /* 关键：同时过渡 width、background、opacity */
-      transition: width .3s ease,
-          height .3s ease,
-          background .3s ease,
-          opacity .3s ease;
-      align-items: center;
-  }
-
-  .point.active {
-      background: var(--dotActive);
-      opacity: 1;
-      width: 22px;
-      /* 从 var(--dotW) 过渡到 20 px */
-  }
-
-  /* ===== 文字 ===== */
-  .scroll-hint .text {
-      margin-top: 10px;
-      font-size: 11px;
-      letter-spacing: .1em;
-      color: var(--textColor);
-      opacity: .6;
-  }
-</style>
-
 </head>
 <body>
-  <style>
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      font-family: 'FZLanLight', sans-serif;
-      font-size: 1.5em;
-      color: #0066cc;
-    }
-  </style>
-  
-  <div id="loader">📜 一言加载中...</div>
-<div class="card">
-  <h2>📜 一言 <button onclick="newQuote()">换一句</button></h2><p>
-</div>
-<div class="sentence1">
-  <div id="sentence" style="font-family: 'FZLanLight';"></div>
+
+<!-- ========== 加载遮罩 ========== -->
+<div id="loader">📜 一言加载中...</div>
+
+<!-- ========== 顶部卡片 ========== -->
+<div class="header-card">
+  <h2>📜 一言 <button onclick="newQuote()">换一句</button></h2>
+  <div class="sentence1" style="font-family: 'FZLanHeavy';font-size: large;">
+    <div id="sentence"></div>
+  </div>
 </div>
 
-<!-- 左下角滚动提示 -->
-<div class="scroll-hint">
-  <div class="pointList">
-      <!-- 生成长度可随意；这里演示 25 个点 -->
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point active"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
-      <span class="point"></span>
+<!-- ========== 聊天室 ========== -->
+<div class="chat-container">
+  <div class="chat-header">WebSocket Chat</div>
+  <div class="messages-container" id="msgs"></div>
+  <div class="input-container">
+    <input id="input" type="text" placeholder="输入消息..." autocomplete="off">
+    <input id="file" type="file" accept="image/*,video/*" class="file-input">
+    <label for="file" class="file-label">文件</label>
+    <button id="sendBtn">发送</button>
   </div>
+</div>
+
+<!-- ========== 左下角滚动提示 ========== -->
+<div class="scroll-hint">
+  <div class="pointList" id="dots"></div>
   <span class="text">SCROLL</span>
 </div>
 
 <script>
-  /* 让高亮点按 0.2 s / 格向下滚动 */
-  const dots = document.querySelectorAll('.point');
-  let index = Array.from(dots).findIndex(d => d.classList.contains('active'));
-
-  setInterval(() => {
-      dots[index].classList.remove('active');   // 取消当前高亮
-      index = (index + 1) % dots.length;        // 计算下一个索引
-      dots[index].classList.add('active');      // 点亮下一个
-  }, 200);
-  window.addEventListener('load', () => {
-  const loader = document.getElementById('loader');
-  loader.style.opacity = 0;
-  setTimeout(() => loader.remove(), 500);
-});
-  const data = {
+/* ========== 金句数据 ========== */
+const data = {
   "金句": [
     {"句子":"生活不是等待暴风雨过去，而是学会在雨中跳舞。","作者":"——维克多·雨果"},
     {"句子":"不要因为结束而哭泣，微笑吧，为你的曾经拥有。","作者":"——加布里埃尔·加西亚·马尔克斯"},
@@ -455,24 +373,12 @@
     {"句子":"一定能找到，通往与这扭曲的终点所截然不同的，另一种结局的正确选项。","作者":"——蔚蓝档案"},
     {"句子":"勇气是在黑夜中重新点燃火焰。","作者":"——蔚蓝档案"}
   ]
-}
-;
+};
 
-  let allQuotes = [];
-  for (const category in data) {
-    data[category].forEach(item => {
-      allQuotes.push({
-        句子: item.句子,
-        作者: item.作者,
-        类别: category
-      });
-    });
-  }
-
-  function newQuote() {
-    const card = document.querySelector('.card');
-
-    card.classList.remove('show', 'done');
+/* ========== 一言逻辑 ========== */
+let allQuotes=[];
+for(const c in data) data[c].forEach(q=>allQuotes.push({句子:q.句子,作者:q.作者,类别:c}));
+function newQuote() {
     const element1 = document.querySelector('.sentence1');
             element1.classList.add('blink');
             // 动画结束后移除类，以便下次可以再次触发
@@ -484,16 +390,105 @@
       const quote = allQuotes[idx];
       document.getElementById("sentence").textContent = quote.句子 + quote.作者 + " 类别:" + quote.类别;
 
-      card.classList.add('show');
-      setTimeout(() => card.classList.add('done'), 100);
-    }, 150);
+      setTimeout(() => card.classList.add('done'), 21);
+    }, 0);
   }
+window.onload=newQuote;
 
-  window.onload = () => {
-    newQuote();
-    document.querySelector('.card').classList.add('fade', 'show', 'done');
-  };
+/* ========== 滚动提示 ========== */
+const dotsBox=document.getElementById('dots');
+for(let i=0;i<20;i++){const d=document.createElement('span');d.className='point';dotsBox.appendChild(d);}
+const dots=document.querySelectorAll('.point');
+let di=0; dots[0].classList.add('active');
+setInterval(()=>{
+  dots[di].classList.remove('active');
+  di=(di+1)%dots.length;
+  dots[di].classList.add('active');
+},200);
+
+/* ========== 聊天室 ========== */
+class Chat{
+  constructor(opts={}){
+    this.wsUrl=opts.wsUrl||'ws://localhost:8765';
+    this.user=opts.user||'用户'+Math.floor(Math.random()*1000);
+    this.room=opts.room||'default';
+    this.avatar=opts.avatar||'./headimg.avif';
+    this.init();
+  }
+  init(){
+    this.msgs=document.getElementById('msgs');
+    this.input=document.getElementById('input');
+    this.file=document.getElementById('file');
+    this.connect();
+    this.bindEvents();
+  }
+  connect(){
+    this.ws=new WebSocket(`${this.wsUrl}?user=${encodeURIComponent(this.user)}&room=${encodeURIComponent(this.room)}`);
+    this.ws.onopen=()=>this.addInfo('已连接');
+    this.ws.onclose=()=>{this.addInfo('断开，3s后重连');setTimeout(()=>this.connect(),3000)};
+    this.ws.onmessage=e=>this.handle(JSON.parse(e.data));
+  }
+  bindEvents(){
+    document.getElementById('sendBtn').addEventListener('click',()=>this.sendText());
+    this.input.addEventListener('keyup',e=>{if(e.key==='Enter')this.sendText()});
+    this.file.addEventListener('change',e=>this.sendFile(e.target.files[0]));
+  }
+  sendText(){
+    const txt=this.input.value.trim(); if(!txt)return;
+    this.ws.send(JSON.stringify({type:'chat',user:this.user,msg:txt,avatar:this.avatar}));
+    this.input.value='';
+  }
+  sendFile(file){
+    if(!file)return;
+    const isImg=file.type.startsWith('image/'),isVid=file.type.startsWith('video/');
+    if(!isImg&&!isVid){alert('仅支持图片/视频');return}
+    const max=isImg?12:29;
+    if(file.size>max*1024*1024){alert(`${isImg?'图片':'视频'}不能超${max}MB`);return}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      this.ws.send(JSON.stringify({type:'chat',user:this.user,msg:e.target.result,avatar:this.avatar,is_image:isImg,is_video:isVid}));
+    };
+    reader.readAsDataURL(file);
+    this.file.value='';
+  }
+  handle(d){
+    if(d.type==='chat') this.addMsg(d);
+    else this.addInfo(`${d.user} ${d.type==='user_joined'?'加入':'离开'}`);
+  }
+  addMsg({user,msg,avatar,is_image,is_video,time}){
+    const own=user===this.user;
+    const el=document.createElement('div');
+    el.className='message '+(own?'own':'');
+    let media='';
+    if(is_image) media=`<img src="${msg}" alt="图" onclick="window.open('${msg}')"/>`;
+    else if(is_video) media=`<video controls style="max-width:100%;max-height:300px;border-radius:10px"><source src="${msg}"></video>`;
+    else media=msg;
+    el.innerHTML=`<img class="avatar" src="${avatar}"/><div class="message-content">${media}<div class="message-info">${user} · ${new Date(time).toLocaleTimeString()}</div></div>`;
+    this.msgs.appendChild(el);
+    this.msgs.scrollTop=this.msgs.scrollHeight;
+  }
+  addInfo(txt){
+    const div=document.createElement('div');
+    div.style.cssText='text-align:center;color:#666;font-size:12px;margin:5px 0';
+    div.textContent=txt;
+    this.msgs.appendChild(div);
+    this.msgs.scrollTop=this.msgs.scrollHeight;
+  }
+}
+new Chat({
+  wsUrl:(new URLSearchParams(location.search).get('ws'))||'ws://localhost:8765',
+  user:(new URLSearchParams(location.search).get('user'))||('用户'+Math.floor(Math.random()*1000)),
+  room:(new URLSearchParams(location.search).get('room'))||'default',
+  avatar:(new URLSearchParams(location.search).get('avatar'))||'./headimg.avif'
+});
+
+/* ========== 关闭加载遮罩 ========== */
+window.addEventListener('load',()=>{
+  const l=document.getElementById('loader');
+  l.style.opacity=0;
+  setTimeout(()=>l.remove(),500);
+});
+
 </script>
-
 </body>
 </html>
