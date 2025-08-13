@@ -102,6 +102,75 @@
   }
 
 </style>
+<style>
+  /* scroll */
+  /* ===== 可自定义变量 ===== */
+  :root {
+      --dotColor: #000000;
+      /* 普通平行四边形颜色 */
+      --dotActive: #6dacff;
+      /* 高亮颜色 */
+      --dotW: 21px;
+      /* 平行四边形宽 */
+      --dotH: 5px;
+      /* 平行四边形高 */
+      --dotGap: 5px;
+      /* 间距 */
+      --textColor: #000000;
+      /* 文字颜色 */
+  }
+
+  /* ===== 布局定位 ===== */
+  .scroll-hint {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      /* 文字贴左边 */
+      pointer-events: none;
+      z-index: 999;
+  }
+
+  /* ===== 横向平行四边形列 ===== */
+  .pointList {
+      display: flex;
+      gap: var(--dotGap);
+  }
+
+  .point {
+      width: var(--dotW);
+      /* 默认宽度 */
+      height: var(--dotH);
+      background: var(--dotColor);
+      opacity: .1;
+      transform: skew(-30deg);
+      /* 关键：同时过渡 width、background、opacity */
+      transition: width .3s ease,
+          height .3s ease,
+          background .3s ease,
+          opacity .3s ease;
+      align-items: center;
+  }
+
+  .point.active {
+      background: var(--dotActive);
+      opacity: 1;
+      width: 22px;
+      /* 从 var(--dotW) 过渡到 20 px */
+  }
+
+  /* ===== 文字 ===== */
+  .scroll-hint .text {
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: .1em;
+      color: var(--textColor);
+      opacity: .6;
+  }
+</style>
+
 </head>
 <body>
   <style>
@@ -129,7 +198,45 @@
 <div class="sentence1">
   <div id="sentence" style="font-family: 'FZLanLight';"></div>
 </div>
+
+<!-- 左下角滚动提示 -->
+<div class="scroll-hint">
+  <div class="pointList">
+      <!-- 生成长度可随意；这里演示 25 个点 -->
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point active"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+      <span class="point"></span>
+  </div>
+  <span class="text">SCROLL</span>
+</div>
+
 <script>
+  /* 让高亮点按 0.2 s / 格向下滚动 */
+  const dots = document.querySelectorAll('.point');
+  let index = Array.from(dots).findIndex(d => d.classList.contains('active'));
+
+  setInterval(() => {
+      dots[index].classList.remove('active');   // 取消当前高亮
+      index = (index + 1) % dots.length;        // 计算下一个索引
+      dots[index].classList.add('active');      // 点亮下一个
+  }, 200);
   window.addEventListener('load', () => {
   const loader = document.getElementById('loader');
   loader.style.opacity = 0;
