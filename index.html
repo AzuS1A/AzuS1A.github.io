@@ -24,77 +24,104 @@ body{
   font-family:FZLanLight;
   color:#333;
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding-top:140px;   /* 给顶部卡片留空间 */
+  height:100vh;
+  overflow:hidden;
 }
 
-/* ===== 顶部固定卡片 ===== */
-.header-card{
-  position:fixed;
-  top:0;left:0;width:100%;
-  z-index:1000;
+/* ===== 左侧面板 ===== */
+.left-panel{
+  width:30vw;
   background:#fff;
-  border-radius:0 0 20px 20px;
-  box-shadow:0 8px 20px rgba(0,0,0,.1);
-  padding:15px 10px;
+  box-shadow:2px 0 10px rgba(0,0,0,.1);
   display:flex;
   flex-direction:column;
-  align-items:center;
-  height: 15vh;
-  overflow-y: auto;
+  overflow:hidden;
 }
-h2{font-size:1.4em;color:#0066cc;margin-bottom:6px}
-#sentence{
-  font-size:1em;line-height:1.5;min-height:40px;
-  background:linear-gradient(90deg,#00aaff 0%,#0066cc 50%,#00aaff 100%);
-  background-size:200% auto;
-  background-clip:border-box ;
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  animation:shine 3s linear infinite;
-  max-width:70vw;text-align:center;
+.left-header{
+  background:#007bff;
+  color:#fff;
+  padding:15px;
+  font-weight:bold;
+  font-size:1.2em;
 }
-@keyframes shine{to{background-position:-200% center;}}
-button{
-  margin-top:12px;
-  background:#00aaff;border:none;padding:8px 18px;
-  border-radius:12px;color:#fff;font-size:1em;cursor:pointer;
+.quote-list{
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
 }
-button:hover{background:#0088cc}
-.blink {
-            animation: blink 0.07s 3;
-        }
-        
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
+.quote-item{
+  padding:12px;
+  margin-bottom:8px;
+  background:#f5f5f5;
+  border-radius:8px;
+  cursor:pointer;
+  transition:all .3s;
+  border-left:3px solid transparent;
+}
+.quote-item:hover{
+  background:#e6f2ff;
+  border-left-color:#007bff;
+}
+.quote-item.active{
+  background:#e6f2ff;
+  border-left-color:#007bff;
+}
+.quote-text{
+  font-size:.9em;
+  color:#333;
+  margin-bottom:5px;
+}
+.quote-author{
+  font-size:.8em;
+  color:#666;
+}
+.quote-category{
+  font-size:.7em;
+  color:#007bff;
+  margin-top:3px;
+}
+
+/* ===== 右侧聊天区 ===== */
+.right-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
 
 /* ===== 聊天室 ===== */
-/* 聊天容器：宽度 100%，最大 800px，固定高度 400px */
 .chat-container {
   width: 100%;
-  max-width: 100vw;
-  height: 80vh;              /* 固定高度 */
-  margin: 5px auto;
+  height: 100%;
   background: #fff;
-  border-radius: 5px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
-  overflow: hidden;           /* 让子元素不溢出圆角 */
+  overflow: hidden;
 }
-
-/* 消息区：占剩余高度，出现滚动条 */
+.chat-header{
+  background:#ffffff;
+  color:#00aaff;
+  padding:15px;
+  text-align:center;
+  font-weight:bold
+}
 .messages-container {
-  flex: 1 1 auto;             /* 占满剩余空间 */
-  overflow-y: auto;           /* 纵向滚动 */
+  flex: 1 1 auto;
+  overflow-y: auto;
   padding: 20px;
   background: #fafafa;
 }
-.chat-header{background:#007bff;color:#fff;padding:15px;text-align:center;font-weight:bold}
+button{
+    margin-top:12px;
+    background:#00aaff;
+    border:none;
+    padding:8px 18px;
+    border-radius:12px;
+    color:#fff;
+    font-size:1em;
+    cursor:pointer;
+  }
 .message{display:flex;margin-bottom:15px;align-items:flex-start}
 .message.own{flex-direction:row-reverse}
 .avatar{width:40px;height:40px;border-radius:50%;margin:0 10px;object-fit:cover;border:2px solid #e0e0e0}
@@ -105,57 +132,76 @@ button:hover{background:#0088cc}
 .message.own .message-info{color:#ccc}
 .input-container{padding:15px;border-top:1px solid #eee;display:flex;gap:10px}
 .input-container input{flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;outline:none}
-.input-container button,.file-label{padding:10px 18px;border:none;background:#007bff;color:#fff;border-radius:20px;cursor:pointer;font-size:14px}
-.input-container button:hover,.file-label:hover{background:#0056b3}
+.input-container button,.file-label,#sendBtn{padding:10px 18px;border:none;background:#007bff;color:#fff;border-radius:20px;cursor:pointer;font-size:14px}
+.input-container button:hover,.file-label:hover,#sendBtn:hover{background:#0056b3}
 .file-input{display:none}
-
-/* ===== 左下角滚动提示 ===== */
-:root{
-  --dotColor:#000;--dotActive:#6dacff;
-  --dotW:21px;--dotH:5px;--dotGap:5px;--textColor:#000;
-}
-.scroll-hint{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;pointer-events:none;z-index:999}
-.pointList{display:flex;gap:var(--dotGap)}
-.point{width:var(--dotW);height:var(--dotH);background:var(--dotColor);opacity:.1;transform:skew(-30deg);transition:all .3s}
-.point.active{background:var(--dotActive);opacity:1;width:22px}
-.scroll-hint .text{margin-top:10px;font-size:11px;letter-spacing:.1em;color:var(--textColor);opacity:.6}
 
 /* ===== 加载遮罩 ===== */
 #loader{
   position:fixed;inset:0;background:#fff;display:flex;justify-content:center;align-items:center;
   z-index:9999;font-size:1.5em;color:#0066cc;transition:opacity .5s
 }
+
+.blink {
+  animation: blink 0.07s 3;
+}
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* ===== 左下角滚动提示 ===== */
+:root{
+  --dotColor:#000;--dotActive:#93cbff;
+  --dotW:21px;--dotH:5px;--dotGap:5px;--textColor:#000;
+}
+.scroll-hint{position:fixed;right:20px;top:20px;display:flex;flex-direction:column;pointer-events:none;z-index:999}
+.pointList{display:flex;gap:var(--dotGap)}
+.point{width:var(--dotW);height:var(--dotH);background:var(--dotColor);opacity:.1;transform:skew(-30deg);transition:all .01s}
+.point.active{background:var(--dotActive);opacity:1;}
+.scroll-hint .text{margin-top:10px;font-size:11px;letter-spacing:.1em;color:var(--textColor);opacity:.01}
 </style>
 </head>
 <body>
 
 <!-- ========== 加载遮罩 ========== -->
-<div id="loader">📜 一言加载中...</div>
+<div id="loader">少女加载中...</div>
 
-<!-- ========== 顶部卡片 ========== -->
-<div class="header-card">
-  <h2>📜 一言 <button onclick="newQuote()">换一句</button></h2>
-  <div class="sentence1" style="font-family: 'FZLanHeavy';font-size: large;">
-    <div id="sentence"></div>
+<div class="left-panel">
+  <div class="left-header">
+    <h2>工具列表</h2>
+  </div>
+  <div class="quote-list" id="quoteList">
+    <!-- 当前随机一言 -->
+    <div class="quote-item" active id="currentQuote">
+    <h2 style="font-size: medium;">📜 一言<h2>
+      <div style="font-size: medium;" class="quote-text blink-area" id="sentence"></div>
+      <div style="font-size: medium;" class="quote-author" id="author"></div>
+      <div style="font-size: medium;" class="quote-category" id="category"></div>
+      <button onclick="newQuote()" style="font-size: medium;">换一句</button>
+    </div>
   </div>
 </div>
 
-<!-- ========== 聊天室 ========== -->
-<div class="chat-container">
-  <div class="chat-header">WebSocket Chat</div>
-  <div class="messages-container" id="msgs"></div>
-  <div class="input-container">
-    <input id="input" type="text" placeholder="输入消息..." autocomplete="off">
-    <input id="file" type="file" accept="image/*,video/*" class="file-input">
-    <label for="file" class="file-label">文件</label>
-    <button id="sendBtn">发送</button>
+<!-- ========== 右侧聊天区 ========== -->
+<div class="right-panel">
+  <div class="chat-container">
+    <div class="chat-header" style="text-align: left;"><h2>WebSocket Chat</h2></div>
+    <div class="messages-container" id="msgs"></div>
+    <div class="input-container">
+      <input id="input" type="text" placeholder="输入消息..." autocomplete="off">
+      <input id="file" type="file" accept="image/*,video/*" class="file-input">
+      <label for="file" class="file-label" style="font-family: FZLanHeavy;">文件</label>
+      <label id="sendBtn" style="font-family: FZLanHeavy;">发送</label>
+    </div>
   </div>
 </div>
 
 <!-- ========== 左下角滚动提示 ========== -->
 <div class="scroll-hint">
   <div class="pointList" id="dots"></div>
-  <span class="text">SCROLL</span>
+  <h2 style="text-align: right;color: #666;font-size: medium;">SCROLL</h2>
 </div>
 
 <script>
@@ -345,22 +391,22 @@ const data = {
     {"句子":"Would you like a peanut? - 你想要个花生吗？","作者":"——猴岛小英雄"},
     {"句子":"Praise the sun! - 赞美太阳！","作者":"——黑暗之魂"},
     {"句子":"Remember, no Russian. - 记住，别开枪，除了俄罗斯人。","作者":"——Call of Duty: Modern Warfare 2"},
-    {"句子":"The healthy human mind doesn’t wake up in the morning thinking this is its last day on Earth. - 健康的人脑不会早晨醒来，认为今天是生命的最后一天。","作者":"——Call of Duty: Modern Warfare 2"},
-    {"句子":"We fight or we die. That’s the mission. - 我们战斗，或者死去。这就是使命。","作者":"——Call of Duty: Black Ops"},
+    {"句子":"The healthy human mind doesn't wake up in the morning thinking this is its last day on Earth. - 健康的人脑不会早晨醒来，认为今天是生命的最后一天。","作者":"——Call of Duty: Modern Warfare 2"},
+    {"句子":"We fight or we die. That's the mission. - 我们战斗，或者死去。这就是使命。","作者":"——Call of Duty: Black Ops"},
     {"句子":"No man gets left behind. Not on my watch. - 没有人会被遗弃。至少在我这里不会。","作者":"——Call of Duty 系列"},
     {"句子":"Frag out! Get ready to rumble! - 手榴弹发射！准备好厮杀！","作者":"——Call of Duty 系列"},
     {"句子":"This is just the beginning. The real fight starts now. - 这才刚开始，真正的战斗现在才开始。","作者":"——Call of Duty: Modern Warfare"},
     {"句子":"Get down! Incoming fire! - 趴下！敌火来袭！","作者":"——Call of Duty 系列"},
     {"句子":"Time to make some noise and show them who we are. - 是时候制造点动静，告诉他们我们是谁了。","作者":"——Call of Duty 系列"},
     {"句子":"We're the tip of the spear, the first through the breach. - 我们是矛尖，冲锋的第一波。","作者":"——Call of Duty: Modern Warfare"},
-    {"句子":"Mission accomplished. Let’s head home. - 任务完成，回家吧。","作者":"——Call of Duty 系列"},
+    {"句子":"Mission accomplished. Let's head home. - 任务完成，回家吧。","作者":"——Call of Duty 系列"},
     {"句子":"You are never alone in this fight, soldier. Watch your six. - 在这场战斗中你永远不会孤单，战士。注意背后。","作者":"——Call of Duty: Ghosts"},
-    {"句子":"Eyes open, boys. Danger’s everywhere. - 睁大眼睛，伙计们，危险无处不在。","作者":"——Call of Duty 系列"},
+    {"句子":"Eyes open, boys. Danger's everywhere. - 睁大眼睛，伙计们，危险无处不在。","作者":"——Call of Duty 系列"},
     {"句子":"Hold the line! We stand or we fall together. - 坚守阵地！我们同生共死。","作者":"——Call of Duty 系列"},
     {"句子":"Cover me! Moving up! - 掩护我！我前进了！","作者":"——Call of Duty 系列"},
-    {"句子":"We’re going loud. No holding back. - 我们全力开火，毫无保留。","作者":"——Call of Duty 系列"},
-    {"句子":"Lock and load. The enemy won’t wait. - 装填弹药，敌人不会等我们。","作者":"——Call of Duty 系列"},
-    {"句子":"Stay sharp. One mistake and it’s over. - 保持警惕，一个错误就是终结。","作者":"——Call of Duty 系列"},
+    {"句子":"We're going loud. No holding back. - 我们全力开火，毫无保留。","作者":"——Call of Duty 系列"},
+    {"句子":"Lock and load. The enemy won't wait. - 装填弹药，敌人不会等我们。","作者":"——Call of Duty 系列"},
+    {"句子":"Stay sharp. One mistake and it's over. - 保持警惕，一个错误就是终结。","作者":"——Call of Duty 系列"},
     {"句子":"Enemy down. Keep pushing forward. - 敌人倒下了，继续前进。","作者":"——Call of Duty 系列"},
     {"句子":"No retreat, no surrender. This is our fight. - 不退缩，不投降。这是我们的战斗。","作者":"——Call of Duty 系列"},
     {"句子":"This war will define us all. Make it count. - 这场战争将定义我们所有人，好好把握。","作者":"——Call of Duty 系列"},
@@ -378,33 +424,20 @@ const data = {
 /* ========== 一言逻辑 ========== */
 let allQuotes=[];
 for(const c in data) data[c].forEach(q=>allQuotes.push({句子:q.句子,作者:q.作者,类别:c}));
+
 function newQuote() {
-    const element1 = document.querySelector('.sentence1');
-            element1.classList.add('blink');
-            // 动画结束后移除类，以便下次可以再次触发
-            setTimeout(() => {
-                element1.classList.remove('blink');
-            }, 400);
-    setTimeout(() => {
-      const idx = Math.floor(Math.random() * allQuotes.length);
-      const quote = allQuotes[idx];
-      document.getElementById("sentence").textContent = quote.句子 + quote.作者 + " 类别:" + quote.类别;
+  const area = document.querySelector('.blink-area');
+  area.classList.add('blink');
+  setTimeout(() => area.classList.remove('blink'), 400);
 
-      setTimeout(() => card.classList.add('done'), 21);
-    }, 0);
-  }
-window.onload=newQuote;
+  const idx = Math.floor(Math.random() * allQuotes.length);
+  const quote = allQuotes[idx];
+  document.getElementById('sentence').textContent = quote.句子;
+  document.getElementById('author').textContent = quote.作者;
+  document.getElementById('category').textContent = quote.类别;
+}
+window.addEventListener('load', newQuote);
 
-/* ========== 滚动提示 ========== */
-const dotsBox=document.getElementById('dots');
-for(let i=0;i<20;i++){const d=document.createElement('span');d.className='point';dotsBox.appendChild(d);}
-const dots=document.querySelectorAll('.point');
-let di=0; dots[0].classList.add('active');
-setInterval(()=>{
-  dots[di].classList.remove('active');
-  di=(di+1)%dots.length;
-  dots[di].classList.add('active');
-},200);
 
 /* ========== 聊天室 ========== */
 class Chat{
@@ -475,20 +508,33 @@ class Chat{
     this.msgs.scrollTop=this.msgs.scrollHeight;
   }
 }
-new Chat({
-  wsUrl:(new URLSearchParams(location.search).get('ws'))||'ws://localhost:8765',
-  user:(new URLSearchParams(location.search).get('user'))||('用户'+Math.floor(Math.random()*1000)),
-  room:(new URLSearchParams(location.search).get('room'))||'default',
-  avatar:(new URLSearchParams(location.search).get('avatar'))||'./headimg.avif'
-});
 
-/* ========== 关闭加载遮罩 ========== */
+/* ========== 初始化 ========== */
 window.addEventListener('load',()=>{
+  
+  new Chat({
+    wsUrl:(new URLSearchParams(location.search).get('ws'))||'ws://localhost:8765',
+    user:(new URLSearchParams(location.search).get('user'))||('用户'+Math.floor(Math.random()*1000)),
+    room:(new URLSearchParams(location.search).get('room'))||'default',
+    avatar:(new URLSearchParams(location.search).get('avatar'))||'./headimg.avif'
+  });
+  
+  // 关闭加载遮罩
   const l=document.getElementById('loader');
   l.style.opacity=0;
   setTimeout(()=>l.remove(),500);
 });
 
+/* ========== 滚动提示 ========== */
+const dotsBox=document.getElementById('dots');
+for(let i=0;i<10;i++){const d=document.createElement('span');d.className='point';dotsBox.appendChild(d);}
+const dots=document.querySelectorAll('.point');
+let di=0; dots[0].classList.add('active');
+setInterval(()=>{
+  dots[di].classList.remove('active');
+  di=(di+1)%dots.length;
+  dots[di].classList.add('active');
+},200);
 </script>
 </body>
 </html>
