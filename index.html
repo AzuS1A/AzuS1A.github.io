@@ -30,7 +30,7 @@ body{
 
 /* ===== 左侧面板 ===== */
 .left-panel{
-  width:30vw;
+  width:45vw;
   background:#fff;
   box-shadow:2px 0 10px rgba(0,0,0,.1);
   display:flex;
@@ -111,6 +111,11 @@ button{
 .point{width:var(--dotW);height:var(--dotH);background:var(--dotColor);opacity:.1;transform:skew(-30deg);transition:all .01s}
 .point.active{background:var(--dotActive);opacity:1;}
 .scroll-hint .text{margin-top:10px;font-size:11px;letter-spacing:.1em;color:var(--textColor);opacity:.01}
+
+img{
+  max-width: 25vw;
+  border-radius: 10px;
+}
 </style>
 </head>
 <body>
@@ -136,8 +141,20 @@ button{
         <div style="font-size: medium;" class="quote-text blink-area2" id="jrrp">还没获取今日人品哦</div>
         <button onclick="jrrp()" style="font-size: medium;">今日人品</button></h2>
       </div>
+    <!-- 当前找使赤 -->
+    <div class="quote-item" active id="jrrp"><h2>豪赤的使<p>
+      <button class="quote-text" onclick="window.open('https://www.bilibili.com/video/BV1CNt3zdEqC', '_blank');" style="color: #fff;font-size: medium;">依旧长句难(108)</button>
+      <img src="https://i0.hdslb.com/bfs/archive/37da27a35b74adb5653b9165e3faae8c87938253.jpg@672w_378h_1c.webp" alt="medium">
+      <button class="quote-text" onclick="window.open('https://www.bilibili.com/video/BV1BE8WzpEcS', '_blank');" style="color: #fff;font-size: medium;">节目效果之小卑鄙</button>
+      <img src="https://i0.hdslb.com/bfs/archive/241ad3974bfa1ba6efaa7dba841cbe8257992e39.jpg@672w_378h_1c.webp" alt="medium">
+      <button class="quote-text" onclick="window.open('https://www.bilibili.com/video/BV1c58UzAEcf', '_blank');" style="color: #fff;font-size: medium;">byd疫情没阳过#哈基米</button>
+      <img src="https://i0.hdslb.com/bfs/archive/d8ea1dda01541fefb1d38ed64f696932133c878f.jpg@672w_378h_1c.webp" alt="medium">
+    </h2>
+    </div>
   </div>
 </div>
+
+<div class="right-panel" style="text-align: center;justify-items: center; min-width: 60vw;min-height: 100vh;"><h2>施工中</h2></div>
 
 <!-- ========== 左下角滚动提示 ========== -->
 <div class="scroll-hint">
