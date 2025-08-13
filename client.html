@@ -125,7 +125,7 @@ class Chat {
 
 // 启动
 new Chat({
-  wsUrl: (new URLSearchParams(location.search).get('ws')) || 'ws://localhost:8765',
+  wsUrl: (new URLSearchParams(location.search).get('ws')) || 'ws://frp-gap.com:65286',
   user: (new URLSearchParams(location.search).get('user')) || ('用户' + Math.floor(Math.random() * 1000)),
   room: (new URLSearchParams(location.search).get('room')) || 'default',
   avatar: (new URLSearchParams(location.search).get('avatar')) || './headimg.avif'

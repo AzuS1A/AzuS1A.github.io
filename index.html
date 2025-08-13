@@ -190,7 +190,7 @@ button{
 </div>
 
 <!-- ========== 右侧聊天区 ========== -->
-<div class="right-panel">
+<div class="right-panel" id="chatBox">
   <div class="chat-container">
     <div class="chat-header" style="text-align: left;"><h2>WebSocket Chat</h2></div>
     <div class="messages-container" id="msgs"></div>
@@ -374,7 +374,7 @@ const data = {
     {"句子":"人民的利益高于一切。","作者":"——邓小平"}
   ],
 
-  "游戏精选台词": [
+  "游戏精选": [
     {"句子":"War. War never changes. - 战争。战争永远不会改变。","作者":"——Fallout 系列"},
     {"句子":"The right man in the wrong place can make all the difference in the world. - 错位的对的人能改变整个世界。","作者":"——Half-Life 2"},
     {"句子":"It's dangerous to go alone! Take this. - 一个人去很危险！拿着这个。","作者":"——塞尔达传说"},
@@ -455,84 +455,112 @@ function jrrp() {
 }
 
 /* ========== 聊天室 ========== */
-class Chat{
-  constructor(opts={}){
-    this.wsUrl=opts.wsUrl||'ws://localhost:8765';
-    this.user=opts.user||'用户'+Math.floor(Math.random()*1000);
-    this.room=opts.room||'default';
-    this.avatar=opts.avatar||'./headimg.avif';
+class Chat {
+  constructor(opts = {}) {
+    this.wsUrl = opts.wsUrl || 'ws://127.0.0.1:8765';
+    this.user  = opts.user  || '用户' + Math.floor(Math.random() * 1000);
+    this.room  = opts.room  || 'default';
+    this.avatar= opts.avatar|| './headimg.avif';
     this.init();
   }
-  init(){
-    this.msgs=document.getElementById('msgs');
-    this.input=document.getElementById('input');
-    this.file=document.getElementById('file');
+
+  init() {
+    // 1) 先隐藏聊天区域
+    this.chatBox   = document.getElementById('chatBox'); // 整个聊天窗口
+    this.chatBox.style.display = 'none';
+
+    this.msgs   = document.getElementById('msgs');
+    this.input  = document.getElementById('input');
+    this.file   = document.getElementById('file');
     this.connect();
     this.bindEvents();
   }
-  connect(){
-    this.ws=new WebSocket(`${this.wsUrl}?user=${encodeURIComponent(this.user)}&room=${encodeURIComponent(this.room)}`);
-    this.ws.onopen=()=>this.addInfo('已连接');
-    this.ws.onclose=()=>{this.addInfo('断开，3s后重连');setTimeout(()=>this.connect(),3000)};
-    this.ws.onmessage=e=>this.handle(JSON.parse(e.data));
+
+  connect() {
+    this.ws = new WebSocket(`${this.wsUrl}?user=${encodeURIComponent(this.user)}&room=${encodeURIComponent(this.room)}`);
+
+    this.ws.onopen = () => {
+      this.addInfo('已连接');
+      this.chatBox.style.display = '';        // 2) 连上后显示
+    };
+
+    this.ws.onclose = () => {
+      this.addInfo('断开，3s后重连');
+      this.chatBox.style.display = 'none';    // 3) 断线后隐藏
+      setTimeout(() => this.connect(), 3000);
+    };
+
+    this.ws.onmessage = e => this.handle(JSON.parse(e.data));
   }
-  bindEvents(){
-    document.getElementById('sendBtn').addEventListener('click',()=>this.sendText());
-    this.input.addEventListener('keyup',e=>{if(e.key==='Enter')this.sendText()});
-    this.file.addEventListener('change',e=>this.sendFile(e.target.files[0]));
+
+  bindEvents() {
+    document.getElementById('sendBtn').addEventListener('click', () => this.sendText());
+    this.input.addEventListener('keyup', e => { if (e.key === 'Enter') this.sendText(); });
+    this.file.addEventListener('change', e => this.sendFile(e.target.files[0]));
   }
-  sendText(){
-    const txt=this.input.value.trim(); if(!txt)return;
-    this.ws.send(JSON.stringify({type:'chat',user:this.user,msg:txt,avatar:this.avatar}));
-    this.input.value='';
+
+  sendText() {
+    const txt = this.input.value.trim();
+    if (!txt) return;
+    this.ws.send(JSON.stringify({ type: 'chat', user: this.user, msg: txt, avatar: this.avatar }));
+    this.input.value = '';
   }
-  sendFile(file){
-    if(!file)return;
-    const isImg=file.type.startsWith('image/'),isVid=file.type.startsWith('video/');
-    if(!isImg&&!isVid){alert('仅支持图片/视频');return}
-    const max=isImg?12:29;
-    if(file.size>max*1024*1024){alert(`${isImg?'图片':'视频'}不能超${max}MB`);return}
-    const reader=new FileReader();
-    reader.onload=e=>{
-      this.ws.send(JSON.stringify({type:'chat',user:this.user,msg:e.target.result,avatar:this.avatar,is_image:isImg,is_video:isVid}));
+
+  sendFile(file) {
+    if (!file) return;
+    const isImg = file.type.startsWith('image/');
+    const isVid = file.type.startsWith('video/');
+    if (!isImg && !isVid) { alert('仅支持图片/视频'); return; }
+    const max = isImg ? 12 : 29;
+    if (file.size > max * 1024 * 1024) { alert(`${isImg ? '图片' : '视频'}不能超${max}MB`); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      this.ws.send(JSON.stringify({
+        type: 'chat', user: this.user, msg: e.target.result,
+        avatar: this.avatar, is_image: isImg, is_video: isVid
+      }));
     };
     reader.readAsDataURL(file);
-    this.file.value='';
+    this.file.value = '';
   }
-  handle(d){
-    if(d.type==='chat') this.addMsg(d);
-    else this.addInfo(`${d.user} ${d.type==='user_joined'?'加入':'离开'}`);
+
+  handle(d) {
+    if (d.type === 'chat') this.addMsg(d);
+    else this.addInfo(`${d.user} ${d.type === 'user_joined' ? '加入' : '离开'}`);
   }
-  addMsg({user,msg,avatar,is_image,is_video,time}){
-    const own=user===this.user;
-    const el=document.createElement('div');
-    el.className='message '+(own?'own':'');
-    let media='';
-    if(is_image) media=`<img src="${msg}" alt="图" onclick="window.open('${msg}')"/>`;
-    else if(is_video) media=`<video controls style="max-width:100%;max-height:300px;border-radius:10px"><source src="${msg}"></video>`;
-    else media=msg;
-    el.innerHTML=`<img class="avatar" src="${avatar}"/><div class="message-content">${media}<div class="message-info">${user} · ${new Date(time).toLocaleTimeString()}</div></div>`;
+
+  addMsg({ user, msg, avatar, is_image, is_video, time }) {
+    const own = user === this.user;
+    const el = document.createElement('div');
+    el.className = 'message ' + (own ? 'own' : '');
+    let media = '';
+    if (is_image)      media = `<img src="${msg}" alt="图" onclick="window.open('${msg}')"/>`;
+    else if (is_video) media = `<video controls style="max-width:100%;max-height:300px;border-radius:10px"><source src="${msg}"></video>`;
+    else               media = msg;
+    el.innerHTML = `<img class="avatar" src="${avatar}"/><div class="message-content">${media}<div class="message-info">${user} · ${new Date(time).toLocaleTimeString()}</div></div>`;
     this.msgs.appendChild(el);
-    this.msgs.scrollTop=this.msgs.scrollHeight;
+    this.msgs.scrollTop = this.msgs.scrollHeight;
   }
-  addInfo(txt){
-    const div=document.createElement('div');
-    div.style.cssText='text-align:center;color:#666;font-size:12px;margin:5px 0';
-    div.textContent=txt;
+
+  addInfo(txt) {
+    const div = document.createElement('div');
+    div.style.cssText = 'text-align:center;color:#666;font-size:12px;margin:5px 0';
+    div.textContent = txt;
     this.msgs.appendChild(div);
-    this.msgs.scrollTop=this.msgs.scrollHeight;
+    this.msgs.scrollTop = this.msgs.scrollHeight;
   }
 }
 
 /* ========== 初始化 ========== */
-window.addEventListener('load',()=>{
-  
+window.addEventListener('load', () => {
+  const params = new URLSearchParams(location.search);
   new Chat({
-    wsUrl:(new URLSearchParams(location.search).get('ws'))||'ws://localhost:8765',
-    user:(new URLSearchParams(location.search).get('user'))||('用户'+Math.floor(Math.random()*1000)),
-    room:(new URLSearchParams(location.search).get('room'))||'default',
-    avatar:(new URLSearchParams(location.search).get('avatar'))||'./headimg.avif'
+    wsUrl: params.get('ws') || 'ws://127.0.0.1:8765',
+    user:  params.get('user') || '用户' + Math.floor(Math.random() * 1000),
+    room:  params.get('room') || 'default',
+    avatar:params.get('avatar') || './headimg.avif'
   });
+
   
   // 关闭加载遮罩
   const l=document.getElementById('loader');
