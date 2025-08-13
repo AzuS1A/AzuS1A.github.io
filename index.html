@@ -457,7 +457,7 @@ function jrrp() {
 /* ========== 聊天室 ========== */
 class Chat {
   constructor(opts = {}) {
-    this.wsUrl = opts.wsUrl || 'ws://[2409:8a62:4122:e400:54aa:6f39:a0ad:5353]:8765';
+    this.wsUrl = opts.wsUrl || 'ws://192.168.1.4:8765';
     this.user  = opts.user  || '用户' + Math.floor(Math.random() * 1000);
     this.room  = opts.room  || 'default';
     this.avatar= opts.avatar|| './headimg.avif';
@@ -555,7 +555,7 @@ class Chat {
 window.addEventListener('load', () => {
   const params = new URLSearchParams(location.search);
   new Chat({
-    wsUrl: params.get('ws') || 'ws://[2409:8a62:4122:e400:54aa:6f39:a0ad:5353]:8765',
+    wsUrl: params.get('ws') || 'ws://192.168.1.4:8765',
     user:  params.get('user') || '用户' + Math.floor(Math.random() * 1000),
     room:  params.get('room') || 'default',
     avatar:params.get('avatar') || './headimg.avif'
