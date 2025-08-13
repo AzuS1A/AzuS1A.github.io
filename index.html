@@ -49,6 +49,7 @@
     min-height:40px;
     background:linear-gradient(90deg,#00aaff 0%,#0066cc 50%,#00aaff 100%);
     background-size:200% auto;
+    background-clip:border-box;
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
     animation:shine 3s linear infinite;
@@ -106,7 +107,7 @@
   <h2>📜 一言 <button onclick="newQuote()">换一句</button></h2><p>
 </div>
 <div class="sentence1">
-  <div id="sentence"></div>
+  <div id="sentence" style="font-family: 'FZLanLight';"></div>
 </div>
 <script>
   const data = {
